@@ -1,0 +1,13 @@
+{
+  "NAME.REQUIRED": "Name is required",
+  "NAME.MAX": "Name must be <= 100 characters",
+
+  "EMAIL.REQUIRED": "Email is required",
+  "EMAIL.INVALID": "Email is invalid",
+  "EMAIL.MAX": "Email must be <= 150 characters",
+
+  "PASSWORD.MIN": "Password must be at least 6 characters",
+  "PASSWORD.MAX": "Password must be <= 255 characters",
+
+  "PHONE.MAX": "Phone must be <= 20 characters"
+}
