@@ -10,6 +10,7 @@ import { Prisma } from 'generated/prisma/client';
 import { LoginType } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { StringValue } from 'ms';
+import { redisClient } from 'src/ultil/redis';
 
 @Injectable()
 export class AuthService {
@@ -80,11 +81,15 @@ export class AuthService {
 
   async profile(token: string) {
     try {
-      const { id } = await this.jwtService.verifyAsync(token);
+      const { id, jti, exp } = await this.jwtService.verifyAsync(token);
+      const blacklist = await redisClient.get(`blacklist:${jti}`);
+      if (blacklist) {
+        return false;
+      }
       const user = await this.prismaService.user.findUnique({
         where: { id },
       });
-      return user;
+      return { user, jti, exp };
     } catch {
       return false;
     }
@@ -108,5 +113,14 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException('Refresh token invalid');
     }
+  }
+  async logout(jti: string, exp: number) {
+    // lưu token vào redis với expire bằng đúng thời gian sống của token
+    const seconds = Math.ceil(exp - Date.now() / 1000);
+    if (seconds <= 0) {
+      return { message: 'token đã hết hạn' };
+    }
+    await redisClient.setEx(`blacklist:${jti}`, seconds, '1');
+    return { message: 'logout thành công' };
   }
 }

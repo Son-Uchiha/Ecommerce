@@ -12,6 +12,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
+import type { AuthRequest } from 'src/types/request';
 
 @Controller('auth')
 export class AuthController {
@@ -26,7 +27,7 @@ export class AuthController {
   }
   @Get('/profile')
   @UseGuards(AuthGuard)
-  profile(@Req() req: any) {
+  profile(@Req() req: AuthRequest) {
     return req.user;
   }
   @Post('/refresh-token')
@@ -35,5 +36,10 @@ export class AuthController {
   }
   @Delete('/logout')
   @UseGuards(AuthGuard)
-  logout() {}
+  logout(@Req() req: AuthRequest) {
+    // lấy đc jti id token để xử lý service thêm vào redis
+    const jti = req.jti;
+    const exp = req.exp;
+    return this.authService.logout(jti, exp);
+  }
 }

@@ -16,11 +16,17 @@ export class AuthGuard implements CanActivate {
     // 1. Lấy token từ Header Authorization
     const token = request.headers.authorization.split(' ')[1];
     // 2. Kiểm tra Token
-    const user = await this.authService.profile(token);
+    const data = await this.authService.profile(token);
+    if (!data) {
+      throw new UnauthorizedException('Token invalid');
+    }
+    const { jti, user, exp } = data;
     if (!user) {
       throw new UnauthorizedException('Token invalid');
     }
     request.user = user;
+    request.jti = jti;
+    request.exp = exp;
     return true;
   }
 }
