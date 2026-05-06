@@ -89,4 +89,24 @@ export class AuthService {
       return false;
     }
   }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const { id } = await this.jwtService.verifyAsync(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+      //Tạo access token mới
+      const payload = {
+        id,
+        jti: crypto.randomUUID(),
+      };
+      const accessToken = await this.jwtService.signAsync(payload);
+      return {
+        accessToken,
+        refreshToken,
+      };
+    } catch {
+      throw new UnauthorizedException('Refresh token invalid');
+    }
+  }
 }
