@@ -2,8 +2,19 @@ import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { PrismaService } from 'src/prisma.service';
+import { JwtModule } from '@nestjs/jwt';
+import { StringValue } from 'ms';
 
 @Module({
+  imports: [
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_ACCESS_SECRET, // Nên để trong file .env
+      signOptions: {
+        expiresIn: process.env.JWT_ACCESS_EXPIRED as StringValue | undefined,
+      },
+    }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, PrismaService],
 })
