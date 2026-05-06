@@ -17,6 +17,7 @@ export class AuthService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
+
   async login(dataLogin: LoginType) {
     // Kiểm tra email có tồn tại hay ko
     const { email, password } = dataLogin;
@@ -46,6 +47,7 @@ export class AuthService {
       refreshToken,
     };
   }
+
   async register(dataRegister: Register) {
     const { email, password } = dataRegister;
     // check email trùng sớm
@@ -73,6 +75,18 @@ export class AuthService {
         throw new ConflictException('Email đã tồn tại');
       }
       throw error;
+    }
+  }
+
+  async profile(token: string) {
+    try {
+      const { id } = await this.jwtService.verifyAsync(token);
+      const user = await this.prismaService.user.findUnique({
+        where: { id },
+      });
+      return user;
+    } catch {
+      return false;
     }
   }
 }
