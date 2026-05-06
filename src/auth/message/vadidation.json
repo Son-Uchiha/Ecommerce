@@ -1,0 +1,6 @@
+{
+  "NAME.REQUIRED": "Tên không đc để trống",
+  "EMAIL.REQUIRED": "Email không được để trống",
+  "PASSWORD.MIN": "Mật khẩu phải từ 6 ký tự",
+  "EMAIL.INVALID": "Email không đúng định dạng"
+}

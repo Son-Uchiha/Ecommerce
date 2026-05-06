@@ -5,6 +5,7 @@ import validation from '../message/vadidation.json';
 const updateUserSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(1, validation['NAME.REQUIRED'])
     .max(100, validation['NAME.MAX'])
     .optional(),
@@ -14,12 +15,6 @@ const updateUserSchema = z.object({
     .min(1, validation['EMAIL.REQUIRED'])
     .max(150, validation['EMAIL.MAX'])
     .pipe(z.email(validation['EMAIL.INVALID']))
-    .optional(),
-
-  password: z
-    .string()
-    .min(6, validation['PASSWORD.MIN'])
-    .max(255, validation['PASSWORD.MAX'])
     .optional(),
 
   phone: z.string().max(20, validation['PHONE.MAX']).optional(),

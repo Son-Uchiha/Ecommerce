@@ -7,6 +7,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateUser } from './dto/create-user';
 import { UpdateUser } from './dto/update-user';
 import { Prisma } from 'generated/prisma/client';
+import { hashPassword } from 'src/ultil/hasing';
 
 @Injectable()
 export class UsersService {
@@ -22,9 +23,13 @@ export class UsersService {
     });
   }
   async createUser(data: CreateUser) {
+    const { password } = data;
     try {
       return await this.prismaService.user.create({
-        data,
+        data: {
+          ...data,
+          password: await hashPassword(password),
+        },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
