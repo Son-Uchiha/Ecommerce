@@ -8,10 +8,15 @@ import { Register } from './dto/register.dto';
 import { hashPassword, verifyPassword } from 'src/ultil/hasing';
 import { Prisma } from 'generated/prisma/client';
 import { LoginType } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { StringValue } from 'ms';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
   async login(dataLogin: LoginType) {
     // Kiểm tra email có tồn tại hay ko
     const { email, password } = dataLogin;
@@ -23,9 +28,23 @@ export class AuthService {
     }
     // Verify Password
     const passwordHash = user.password;
-    if (!verifyPassword(password, passwordHash)) {
+    if (!(await verifyPassword(password, passwordHash))) {
       throw new UnauthorizedException('Email or password invalid');
     }
+    // Cấp phát token
+    const payload = {
+      id: user.id,
+      jti: crypto.randomUUID(),
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: process.env.JWT_REFRESH_EXPIRED as StringValue | undefined,
+    });
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
   async register(dataRegister: Register) {
     const { email, password } = dataRegister;

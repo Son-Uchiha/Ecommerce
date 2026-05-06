@@ -4,9 +4,11 @@ import { AuthController } from './auth.controller';
 import { PrismaService } from 'src/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { StringValue } from 'ms';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_ACCESS_SECRET, // Nên để trong file .env
