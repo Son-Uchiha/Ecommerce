@@ -47,8 +47,12 @@ export class AuthService {
     });
     this.mailerService.sendMail({
       to: user.email,
-      subject: 'Welcome',
-      html: '<h1>Chào mừng bạn đến với hệ thống</h1>',
+      subject: 'Cảnh báo đăng nhập',
+      template: 'login-notice',
+      context: {
+        name: user.name,
+        time: new Date().toLocaleString(),
+      },
     });
     return {
       user,

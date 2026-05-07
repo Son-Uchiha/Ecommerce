@@ -7,6 +7,8 @@ import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { EjsAdapter } from '@nestjs-modules/mailer/adapters/ejs.adapter';
+import { join } from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -23,6 +25,15 @@ import { MailerModule } from '@nestjs-modules/mailer';
       },
       defaults: {
         from: '"Ecommerce" <B23DCCN720@gmail.com>',
+      },
+      template: {
+        dir: join(__dirname, '..', 'mail', 'templates'),
+
+        adapter: new EjsAdapter(),
+
+        options: {
+          strict: false,
+        },
       },
     }),
   ],
