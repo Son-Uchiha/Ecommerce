@@ -49,7 +49,6 @@ export class AuthService {
       expiresIn: process.env.JWT_REFRESH_EXPIRED as StringValue | undefined,
     });
     // Gửi mail -> add job vào hàng đợi
-    console.log('add job');
     await this.emailQueue.add('login-notice', {
       email: user.email,
       name: user.name,
