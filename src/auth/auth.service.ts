@@ -11,12 +11,14 @@ import { LoginType } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { StringValue } from 'ms';
 import { redisClient } from 'src/ultil/redis';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly mailerService: MailerService,
   ) {}
 
   async login(dataLogin: LoginType) {
@@ -43,7 +45,13 @@ export class AuthService {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: process.env.JWT_REFRESH_EXPIRED as StringValue | undefined,
     });
+    this.mailerService.sendMail({
+      to: user.email,
+      subject: 'Welcome',
+      html: '<h1>Chào mừng bạn đến với hệ thống</h1>',
+    });
     return {
+      user,
       accessToken,
       refreshToken,
     };
