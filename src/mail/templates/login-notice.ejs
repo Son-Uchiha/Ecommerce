@@ -2,123 +2,175 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Ecommerce Login Notice</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Ecommerce Security Alert</title>
   </head>
 
   <body
     style="
       margin: 0;
       padding: 0;
-      background-color: #f4f7fb;
-      font-family: Arial, sans-serif;
+      background-color: #f3f6fb;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111827;
     "
   >
-    <table width="100%" cellpadding="0" cellspacing="0" style="padding: 40px 0">
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      style="padding: 40px 16px"
+    >
       <tr>
         <td align="center">
+          <!-- Container -->
           <table
-            width="600"
+            width="620"
             cellpadding="0"
             cellspacing="0"
+            border="0"
             style="
+              max-width: 620px;
+              width: 100%;
               background: #ffffff;
-              border-radius: 14px;
+              border-radius: 18px;
               overflow: hidden;
-              box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+              box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
             "
           >
             <!-- Header -->
             <tr>
               <td
                 style="
-                  background: linear-gradient(135deg, #111827, #2563eb);
-                  padding: 28px;
+                  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+                  padding: 42px 40px;
                   text-align: center;
                 "
               >
                 <h1
                   style="
                     margin: 0;
-                    color: white;
-                    font-size: 28px;
-                    letter-spacing: 1px;
+                    font-size: 32px;
+                    font-weight: 700;
+                    color: #ffffff;
+                    letter-spacing: 0.5px;
                   "
                 >
                   Ecommerce
                 </h1>
 
-                <p style="margin-top: 8px; color: #dbeafe; font-size: 14px">
-                  Secure Account Notification
+                <p
+                  style="
+                    margin: 12px 0 0;
+                    color: #dbeafe;
+                    font-size: 14px;
+                    line-height: 1.6;
+                  "
+                >
+                  Security Login Notification
                 </p>
               </td>
             </tr>
 
             <!-- Body -->
             <tr>
-              <td style="padding: 36px">
-                <h2 style="margin-top: 0; color: #111827; font-size: 24px">
-                  Xin chào <%= name %>,
+              <td style="padding: 42px 40px">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 15px;
+                    color: #6b7280;
+                    line-height: 1.8;
+                  "
+                >
+                  Xin chào,
+                </p>
+
+                <h2 style="margin: 8px 0 20px; font-size: 28px; color: #111827">
+                  <%= name %>
                 </h2>
 
-                <p style="color: #4b5563; line-height: 1.8; font-size: 15px">
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 15px;
+                    line-height: 1.9;
+                    color: #4b5563;
+                  "
+                >
                   Chúng tôi phát hiện tài khoản của bạn vừa đăng nhập thành công
                   vào hệ thống Ecommerce.
                 </p>
 
-                <!-- Info Box -->
+                <!-- Login Info -->
                 <table
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
+                  border="0"
                   style="
-                    margin: 28px 0;
-                    background: #f9fafb;
+                    margin-top: 32px;
+                    background: #f8fafc;
                     border: 1px solid #e5e7eb;
-                    border-radius: 10px;
+                    border-radius: 14px;
                   "
                 >
                   <tr>
-                    <td style="padding: 20px">
+                    <td style="padding: 24px">
                       <p
                         style="
-                          margin: 0 0 10px;
-                          color: #6b7280;
-                          font-size: 14px;
+                          margin: 0 0 12px;
+                          color: #64748b;
+                          font-size: 13px;
+                          text-transform: uppercase;
+                          letter-spacing: 0.5px;
                         "
                       >
                         Thời gian đăng nhập
                       </p>
 
-                      <strong style="color: #111827; font-size: 16px">
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 18px;
+                          font-weight: 700;
+                          color: #0f172a;
+                        "
+                      >
                         <%= time %>
-                      </strong>
+                      </p>
                     </td>
                   </tr>
                 </table>
 
-                <!-- Warning -->
+                <!-- Security Notice -->
                 <table
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
+                  border="0"
                   style="
+                    margin-top: 24px;
                     background: #eff6ff;
-                    border-left: 4px solid #2563eb;
-                    border-radius: 8px;
+                    border: 1px solid #bfdbfe;
+                    border-left: 5px solid #2563eb;
+                    border-radius: 12px;
                   "
                 >
                   <tr>
-                    <td style="padding: 18px">
+                    <td style="padding: 20px 22px">
                       <p
                         style="
                           margin: 0;
-                          color: #1e3a8a;
-                          line-height: 1.7;
+                          color: #1e40af;
                           font-size: 14px;
+                          line-height: 1.8;
                         "
                       >
-                        Nếu đây không phải là bạn, hãy đổi mật khẩu ngay để bảo
-                        vệ tài khoản và liên hệ hỗ trợ khách hàng.
+                        Nếu đây không phải là bạn, vui lòng đổi mật khẩu ngay để
+                        bảo vệ tài khoản và liên hệ bộ phận hỗ trợ khách hàng.
                       </p>
                     </td>
                   </tr>
@@ -129,7 +181,8 @@
                   width="100%"
                   cellpadding="0"
                   cellspacing="0"
-                  style="margin-top: 32px"
+                  border="0"
+                  style="margin-top: 36px"
                 >
                   <tr>
                     <td align="center">
@@ -137,13 +190,14 @@
                         href="#"
                         style="
                           display: inline-block;
-                          padding: 14px 28px;
                           background: #2563eb;
-                          color: white;
+                          color: #ffffff;
                           text-decoration: none;
-                          border-radius: 8px;
-                          font-weight: bold;
+                          padding: 15px 34px;
+                          border-radius: 10px;
                           font-size: 15px;
+                          font-weight: 700;
+                          letter-spacing: 0.3px;
                         "
                       >
                         Đổi mật khẩu
@@ -151,21 +205,63 @@
                     </td>
                   </tr>
                 </table>
+
+                <!-- Divider -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="margin-top: 36px"
+                >
+                  <tr>
+                    <td
+                      style="
+                        border-top: 1px solid #e5e7eb;
+                        font-size: 0;
+                        line-height: 0;
+                      "
+                    >
+                      &nbsp;
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Extra -->
+                <p
+                  style="
+                    margin: 28px 0 0;
+                    color: #94a3b8;
+                    font-size: 13px;
+                    line-height: 1.8;
+                    text-align: center;
+                  "
+                >
+                  Đây là email tự động, vui lòng không phản hồi trực tiếp email
+                  này.
+                </p>
               </td>
             </tr>
 
             <!-- Footer -->
             <tr>
               <td
-                style="
-                  background: #f9fafb;
-                  text-align: center;
-                  padding: 24px;
-                  color: #9ca3af;
-                  font-size: 13px;
-                "
+                style="background: #f8fafc; padding: 28px; text-align: center"
               >
-                © 2026 Ecommerce. All rights reserved.
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 13px;
+                    color: #94a3b8;
+                    line-height: 1.7;
+                  "
+                >
+                  © 2026 Ecommerce. All rights reserved.
+                </p>
+
+                <p style="margin: 8px 0 0; font-size: 12px; color: #cbd5e1">
+                  Secure • Reliable • Modern Commerce Platform
+                </p>
               </td>
             </tr>
           </table>
