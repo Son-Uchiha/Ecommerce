@@ -12,13 +12,16 @@ import { JwtService } from '@nestjs/jwt';
 import { StringValue } from 'ms';
 import { redisClient } from 'src/ultil/redis';
 import { MailerService } from '@nestjs-modules/mailer';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+let a = 1; //test id worker
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly mailerService: MailerService,
+    @InjectQueue('mail_queue') private emailQueue: Queue,
   ) {}
 
   async login(dataLogin: LoginType) {
@@ -45,14 +48,14 @@ export class AuthService {
       secret: process.env.JWT_REFRESH_SECRET,
       expiresIn: process.env.JWT_REFRESH_EXPIRED as StringValue | undefined,
     });
-    this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Cảnh báo đăng nhập',
-      template: 'login-notice',
-      context: {
-        name: user.name,
-        time: new Date().toLocaleString(),
-      },
+    // Gửi mail -> add job vào hàng đợi
+    console.log('add job');
+    await this.emailQueue.add('login-notice', {
+      email: user.email,
+      name: user.name,
+      link: 'https://www.facebook.com/hoshino.yuki.2024',
+      id: ++a,
+      removeOnComplete: true, // Xóa job khỏi Redis khi xong để nhẹ RAM
     });
     return {
       user,

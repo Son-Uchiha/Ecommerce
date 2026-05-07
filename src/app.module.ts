@@ -10,39 +10,22 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/adapters/ejs.adapter';
 import { join } from 'path';
 import { BullModule } from '@nestjs/bullmq';
+import { EmailConsumers } from './consumer/email.consumer';
+import { WorkerModule } from './workers/worker.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
     UsersModule,
     AuthModule,
-    MailerModule.forRoot({
-      transport: {
-        host: 'smtp.gmail.com',
-        port: 465,
-        auth: {
-          user: process.env.MAIL_USER,
-          pass: process.env.MAIL_PASS,
-        },
-      },
-      defaults: {
-        from: '"Ecommerce" <B23DCCN720@gmail.com>',
-      },
-      template: {
-        dir: join(__dirname, '..', 'mail', 'templates'),
-
-        adapter: new EjsAdapter(),
-
-        options: {
-          strict: false,
-        },
-      },
-    }),
     BullModule.forRoot({
       connection: {
         host: 'localhost',
         port: 6379,
+        password: process.env.REDIS_PASSWORD,
       },
     }),
+    WorkerModule,
   ],
   controllers: [AppController],
   providers: [

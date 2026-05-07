@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { StringValue } from 'ms';
 import { ConfigModule } from '@nestjs/config';
+import { BullModule } from '@nestjs/bullmq';
 
 @Module({
   imports: [
@@ -15,6 +16,9 @@ import { ConfigModule } from '@nestjs/config';
       signOptions: {
         expiresIn: process.env.JWT_ACCESS_EXPIRED as StringValue | undefined,
       },
+    }),
+    BullModule.registerQueue({
+      name: 'mail_queue',
     }),
   ],
   controllers: [AuthController],
