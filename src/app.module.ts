@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/adapters/ejs.adapter';
 import { join } from 'path';
+import { BullModule } from '@nestjs/bullmq';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -34,6 +35,12 @@ import { join } from 'path';
         options: {
           strict: false,
         },
+      },
+    }),
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
       },
     }),
   ],
