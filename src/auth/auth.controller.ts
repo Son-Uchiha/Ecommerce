@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -14,6 +15,7 @@ import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import type { AuthRequest } from 'src/types/request';
 import { forgotPasswordDto } from './dto/forgotPassword.dto';
+import { ResetPasswordDto } from './dto/resetPassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -49,6 +51,22 @@ export class AuthController {
     return {
       success: true,
       message: 'Kiểm tra mail',
+    };
+  }
+  @Post('/verify-otp')
+  async verifyOtp(@Body() { otp }: { otp: string }) {
+    await this.authService.verifyOtp(otp);
+    return {
+      success: true,
+      message: 'Xác thực thành công',
+    };
+  }
+  @Put('/reset-password')
+  async resetPassword(@Body() data: ResetPasswordDto) {
+    await this.authService.resetPassword(data);
+    return {
+      success: true,
+      message: 'Đặt lại mật khẩu thành công',
     };
   }
 }

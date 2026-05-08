@@ -40,5 +40,18 @@ export class EmailConsumers extends WorkerHost {
       });
       return {}; // coi là hoàn thành
     }
+
+    if (job.name === 'reset-password') {
+      console.log(job.data);
+      await this.mailerService.sendMail({
+        to: job.data.email,
+        subject: 'Đặt lại mật khẩu thành công',
+        template: 'resetPassword',
+        context: {
+          email: job.data.email,
+        },
+      });
+      return {};
+    }
   }
 }

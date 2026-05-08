@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -16,6 +17,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { forgotPassword } from './dto/forgotPassword.dto';
 import * as crypto from 'crypto';
+import { ResetPassword } from './dto/resetPassword.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -147,10 +149,36 @@ export class AuthService {
     const otp = crypto.randomInt(100000, 999999).toString();
     //Lưu vào redis kèm userId
     const ttl = 1000;
-    await redisClient.setEx(`forgotPassWord:${otp}`, ttl, user.id.toString());
+    await redisClient.setEx(`forgotPassword:${otp}`, ttl, user.id.toString());
     // addJob để gửi mail otp
     await this.emailQueue.add('forgotPassword-otp', {
       otp,
+      email: user.email,
+    });
+  }
+  async verifyOtp(otp: string) {
+    const userIdFromRedis = await redisClient.get(`forgotPassword:${otp}`);
+    if (!userIdFromRedis) {
+      throw new BadRequestException('OTP không hợp lệ');
+    }
+    return userIdFromRedis;
+  }
+  async resetPassword(data: ResetPassword) {
+    const { password, confirmPassword, otp } = data;
+    if (password !== confirmPassword) {
+      throw new BadRequestException('2 mật khẩu không khớp nhau');
+    }
+    const UserId = await this.verifyOtp(otp);
+    const newPassword = await hashPassword(password);
+    const user = await this.prismaService.user.update({
+      where: { id: +UserId },
+      data: {
+        password: newPassword,
+      },
+    });
+
+    //add job để gửi mail resetPassword thành công
+    await this.emailQueue.add('reset-password', {
       email: user.email,
     });
   }
