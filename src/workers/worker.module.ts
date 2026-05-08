@@ -5,7 +5,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { EmailConsumers } from 'src/consumer/email.consumer';
-console.log('Worker start');
 @Module({
   imports: [
     ConfigModule.forRoot(),
