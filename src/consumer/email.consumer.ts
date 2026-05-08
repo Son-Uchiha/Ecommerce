@@ -27,5 +27,18 @@ export class EmailConsumers extends WorkerHost {
       }
       return { sent: true, to: email };
     }
+
+    if (job.name === 'forgotPassword-otp') {
+      await this.mailerService.sendMail({
+        to: job.data.email,
+        subject: 'Đặt lại mật khẩu',
+        template: 'forgotPassword',
+        context: {
+          email: job.data.email,
+          otp: job.data.otp,
+        },
+      });
+      return {}; // coi là hoàn thành
+    }
   }
 }

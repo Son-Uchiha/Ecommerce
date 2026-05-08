@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
@@ -13,7 +14,8 @@ import { StringValue } from 'ms';
 import { redisClient } from 'src/ultil/redis';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-
+import { forgotPassword } from './dto/forgotPassword.dto';
+import * as crypto from 'crypto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -132,5 +134,24 @@ export class AuthService {
     }
     await redisClient.setEx(`blacklist:${jti}`, seconds, '1');
     return { message: 'logout thành công' };
+  }
+  async forgotPassword({ email }: forgotPassword) {
+    // Kiểm tra email có tồn tại không ?
+    const user = await this.prismaService.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new NotFoundException('User không tồn tại');
+    }
+    // Tạo mã otp 6 số
+    const otp = crypto.randomInt(100000, 999999).toString();
+    //Lưu vào redis kèm userId
+    const ttl = 1000;
+    await redisClient.setEx(`forgotPassWord:${otp}`, ttl, user.id.toString());
+    // addJob để gửi mail otp
+    await this.emailQueue.add('forgotPassword-otp', {
+      otp,
+      email: user.email,
+    });
   }
 }

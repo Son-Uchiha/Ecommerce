@@ -13,6 +13,7 @@ import { LoginDto } from './dto/login.dto';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import type { AuthRequest } from 'src/types/request';
+import { forgotPasswordDto } from './dto/forgotPassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -41,5 +42,13 @@ export class AuthController {
     const jti = req.jti;
     const exp = req.exp;
     return this.authService.logout(jti, exp);
+  }
+  @Post('/forgot-password')
+  async forgotPassword(@Body() dto: forgotPasswordDto) {
+    await this.authService.forgotPassword(dto);
+    return {
+      success: true,
+      message: 'Kiểm tra mail',
+    };
   }
 }
