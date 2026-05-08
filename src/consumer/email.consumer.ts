@@ -9,7 +9,6 @@ export class EmailConsumers extends WorkerHost {
     super();
   }
   async process(job: Job<any, any, string>): Promise<any> {
-    console.log(job.data.id);
     if (job.name === 'login-notice') {
       const { email, name } = job.data;
       try {

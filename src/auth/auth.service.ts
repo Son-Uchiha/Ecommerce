@@ -11,10 +11,8 @@ import { LoginType } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { StringValue } from 'ms';
 import { redisClient } from 'src/ultil/redis';
-import { MailerService } from '@nestjs-modules/mailer';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-let a = 1; //test id worker
 
 @Injectable()
 export class AuthService {
@@ -52,8 +50,6 @@ export class AuthService {
     await this.emailQueue.add('login-notice', {
       email: user.email,
       name: user.name,
-      link: 'https://www.facebook.com/hoshino.yuki.2024',
-      id: ++a,
       removeOnComplete: true, // Xóa job khỏi Redis khi xong để nhẹ RAM
     });
     return {
