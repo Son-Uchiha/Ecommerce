@@ -16,6 +16,7 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 import type { AuthRequest } from 'src/types/request';
 import { forgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
+import { ChangePasswordDto } from './dto/changePassword.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -68,5 +69,13 @@ export class AuthController {
       success: true,
       message: 'Đặt lại mật khẩu thành công',
     };
+  }
+  @Post('/change-password')
+  @UseGuards(AuthGuard)
+  async changePassword(
+    @Body() data: ChangePasswordDto,
+    @Req() req: AuthRequest,
+  ) {
+    return await this.authService.changePassword(req.user.id, data);
   }
 }

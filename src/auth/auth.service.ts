@@ -18,6 +18,7 @@ import { Queue } from 'bullmq';
 import { forgotPassword } from './dto/forgotPassword.dto';
 import * as crypto from 'crypto';
 import { ResetPassword } from './dto/resetPassword.dto';
+import { ChangePassword } from './dto/changePassword.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -180,7 +181,7 @@ export class AuthService {
     // Tạo mã otp 6 số
     const otp = crypto.randomInt(100000, 999999).toString();
     //Lưu vào redis kèm userId
-    const ttl = 1000;
+    const ttl = 60;
     await redisClient.setEx(`forgotPassword:${otp}`, ttl, user.id.toString());
     // addJob để gửi mail otp
     await this.emailQueue.add('forgotPassword-otp', {
@@ -215,5 +216,37 @@ export class AuthService {
     await this.emailQueue.add('reset-password', {
       email: user.email,
     });
+  }
+  async changePassword(userId: number, data: ChangePassword) {
+    const { oldPassword, newPassword, confirmPassword } = data;
+    // 1. Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp không
+    if (newPassword !== confirmPassword) {
+      throw new BadRequestException('Mật khẩu mới không khớp');
+    }
+    // 2. Lấy thông tin user hiện tại từ DB
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    // 3. Kiểm tra mật khẩu cũ có đúng không
+    const isMatch = await verifyPassword(oldPassword, user.password);
+    if (!isMatch) {
+      throw new BadRequestException('Mật khẩu cũ không chính xác');
+    }
+    // 4. Hash mật khẩu mới và cập nhật
+    const hashedNewPassword = await hashPassword(newPassword);
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { password: hashedNewPassword },
+    });
+    // 5. (Optional) Đẩy job gửi mail thông báo đã đổi mật khẩu thành công
+    await this.emailQueue.add('change-password', {
+      email: user.email,
+    });
+    return { message: 'Đổi mật khẩu thành công' };
   }
 }

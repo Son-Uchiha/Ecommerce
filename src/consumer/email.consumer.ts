@@ -41,8 +41,19 @@ export class EmailConsumers extends WorkerHost {
       return {}; // coi là hoàn thành
     }
 
+    if (job.name === 'change-password') {
+      await this.mailerService.sendMail({
+        to: job.data.email,
+        subject: 'Đổi mật khẩu thành công',
+        template: 'changePassword',
+        context: {
+          email: job.data.email,
+        },
+      });
+      return {};
+    }
+
     if (job.name === 'reset-password') {
-      console.log(job.data);
       await this.mailerService.sendMail({
         to: job.data.email,
         subject: 'Đặt lại mật khẩu thành công',
