@@ -23,5 +23,6 @@ import { BullModule } from '@nestjs/bullmq';
   ],
   controllers: [AuthController],
   providers: [AuthService, PrismaService],
+  exports: [AuthService],
 })
 export class AuthModule {}

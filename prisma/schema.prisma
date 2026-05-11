@@ -60,7 +60,6 @@ model Permission {
 }
 
 model RolePermissions {
-  id           Int        @id @default(autoincrement())
   roleId       Int
   permissionId Int
   role         Role       @relation(fields: [roleId], references: [id])
@@ -68,11 +67,11 @@ model RolePermissions {
   createdAt    DateTime   @default(now()) @db.Timestamp()
   updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamp()
 
+  @@id([roleId, permissionId]) // Khóa chính tổ hợp quan trọng ở đây
   @@map("roles_permissions")
 }
 
 model UserRole {
-  id        Int      @id @default(autoincrement())
   roleId    Int
   userId    Int
   role      Role     @relation(fields: [roleId], references: [id])
@@ -80,6 +79,7 @@ model UserRole {
   createdAt DateTime @default(now()) @db.Timestamp()
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
 
+  @@id([userId, roleId]) // Ngăn một user bị gán trùng 1 role nhiều lần
   @@map("users_roles")
 }
 

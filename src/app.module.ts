@@ -12,10 +12,14 @@ import { join } from 'path';
 import { BullModule } from '@nestjs/bullmq';
 import { EmailConsumers } from './consumer/email.consumer';
 import { WorkerModule } from './workers/worker.module';
+import { ProductsModule } from './admin/products/products.module';
+import { PermissionsModule } from './admin/permissions/permissions.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    PermissionsModule,
+    ProductsModule,
     UsersModule,
     AuthModule,
     BullModule.forRoot({
