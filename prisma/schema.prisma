@@ -14,14 +14,17 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(100)
-  email     String   @unique @db.VarChar(150)
-  password  String   @db.VarChar(255)
-  phone     String?  @db.VarChar(20)
-  status    Status   @default(ACTIVE)
-  createdAt DateTime @default(now()) @db.Timestamp()
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+  id              Int              @id @default(autoincrement())
+  name            String           @db.VarChar(100)
+  email           String           @unique @db.VarChar(150)
+  password        String           @db.VarChar(255)
+  phone           String?          @db.VarChar(20)
+  status          Status           @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @db.Timestamp()
+  updatedAt       DateTime         @default(now()) @updatedAt @db.Timestamp()
+  userRoles       UserRole[]
+  userPermissions UserPermission[]
+  isSuperAdmin    Boolean          @default(false)
 
   @@map("users")
 }
@@ -29,4 +32,65 @@ model User {
 enum Status {
   ACTIVE
   BLOCKED
+}
+
+//Phân quyền
+model Role {
+  id          Int               @id @default(autoincrement())
+  name        String            @db.VarChar(200)
+  status      Boolean           @default(true)
+  createdAt   DateTime          @default(now()) @db.Timestamp()
+  updatedAt   DateTime          @default(now()) @updatedAt @db.Timestamp()
+  permissions RolePermissions[]
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(200)
+  status          Boolean           @default(true)
+  createdAt       DateTime          @default(now()) @db.Timestamp()
+  updatedAt       DateTime          @default(now()) @updatedAt @db.Timestamp()
+  roles           RolePermissions[]
+  userPermissions UserPermission[]
+
+  @@map("permissions")
+}
+
+model RolePermissions {
+  id           Int        @id @default(autoincrement())
+  roleId       Int
+  permissionId Int
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  createdAt    DateTime   @default(now()) @db.Timestamp()
+  updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamp()
+
+  @@map("roles_permissions")
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  roleId    Int
+  userId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamp()
+  updatedAt DateTime @default(now()) @updatedAt @db.Timestamp()
+
+  @@map("users_roles")
+}
+
+model UserPermission {
+  id           Int        @id @default(autoincrement())
+  permissionId Int
+  userId       Int
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  user         User       @relation(fields: [userId], references: [id])
+  createdAt    DateTime   @default(now()) @db.Timestamp()
+  updatedAt    DateTime   @default(now()) @updatedAt @db.Timestamp()
+
+  @@map("users_permissions")
 }

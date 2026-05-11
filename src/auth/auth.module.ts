@@ -12,7 +12,7 @@ import { BullModule } from '@nestjs/bullmq';
     ConfigModule.forRoot(),
     JwtModule.register({
       global: true,
-      secret: process.env.JWT_ACCESS_SECRET, // Nên để trong file .env
+      secret: process.env.JWT_ACCESS_SECRET,
       signOptions: {
         expiresIn: process.env.JWT_ACCESS_EXPIRED as StringValue | undefined,
       },
