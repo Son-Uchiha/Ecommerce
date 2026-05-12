@@ -17,6 +17,12 @@ const updateUserSchema = z.object({
     .pipe(z.email(validation['EMAIL.INVALID']))
     .optional(),
 
+  password: z
+    .string()
+    .min(6, validation['PASSWORD.MIN'])
+    .max(255, validation['PASSWORD.MAX'])
+    .optional(),
+
   phone: z.string().max(20, validation['PHONE.MAX']).optional(),
 
   status: z.enum(['ACTIVE', 'BLOCKED']).optional(),

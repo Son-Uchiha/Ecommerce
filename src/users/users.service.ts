@@ -43,10 +43,14 @@ export class UsersService {
     }
   }
   async updateUser(id: number, data: UpdateUser) {
+    const { password } = data;
     try {
       return await this.prismaService.user.update({
         where: { id },
-        data,
+        data: {
+          ...data,
+          password: await hashPassword(password as string),
+        },
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
