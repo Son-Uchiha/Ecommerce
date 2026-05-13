@@ -21,10 +21,12 @@ export class CategoriesController {
   create(@Body() dto: CreateCategoryDto) {
     return this.categoriesService.createCategory(dto);
   }
+  @UseGuards(PermissionsGuardMixin('category:update'))
   @Put('/:id')
   update(@Param('id') id: number, @Body() dto: UpdateCategoryDto) {
     return this.categoriesService.updateCategory(+id, dto);
   }
+  @UseGuards(PermissionsGuardMixin('category:delete'))
   @Delete('/:id')
   delete(@Param('id') id: number) {
     return this.categoriesService.deleteCategory(+id);
