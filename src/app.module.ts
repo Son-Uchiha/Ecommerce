@@ -10,6 +10,8 @@ import { BullModule } from '@nestjs/bullmq';
 import { WorkerModule } from './workers/worker.module';
 import { ProductsModule } from './admin/products/products.module';
 import { PermissionsModule } from './admin/permissions/permissions.module';
+import { AdminCategoriesModule } from './admin/categories/categories.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { PermissionsModule } from './admin/permissions/permissions.module';
       },
     }),
     WorkerModule,
+    AdminCategoriesModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [

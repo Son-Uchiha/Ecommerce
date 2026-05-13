@@ -108,7 +108,7 @@ enum ProductStatus {
 }
 
 model Category {
-  id          BigInt         @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   name        String         @db.VarChar(100)
   slug        String         @unique @db.VarChar(150)
   description String?        @db.Text
@@ -123,8 +123,8 @@ model Category {
 }
 
 model Product {
-  id          BigInt        @id @default(autoincrement())
-  categoryId  BigInt?       @map("category_id")
+  id          Int           @id @default(autoincrement())
+  categoryId  Int?          @map("category_id")
   name        String        @db.VarChar(150)
   slug        String        @unique @db.VarChar(180)
   description String?       @db.Text
@@ -147,8 +147,8 @@ model Product {
 }
 
 model ProductImage {
-  id        BigInt   @id @default(autoincrement())
-  productId BigInt   @map("product_id")
+  id        Int      @id @default(autoincrement())
+  productId Int      @map("product_id")
   imageUrl  String   @map("image_url") @db.VarChar(500)
   isMain    Boolean  @default(false) @map("is_main")
   createdAt DateTime @default(now()) @map("created_at")
