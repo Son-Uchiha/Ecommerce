@@ -34,9 +34,11 @@ export class UsersService {
         },
 
         // search Keyword
-        name: {
-          contains: keyword,
-        },
+        ...(keyword && {
+          name: {
+            contains: keyword,
+          },
+        }),
       },
       include: {
         userRoles: {

@@ -7,7 +7,7 @@ import { PermissionsGuardMixin } from 'src/guards/permissions/permissions.guard'
 @UseGuards(AuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
-  @UseGuards(PermissionsGuardMixin('product:read'))
+  // @UseGuards(PermissionsGuardMixin('product:read'))
   @Get('')
   findAll() {
     return 'Get List Products';

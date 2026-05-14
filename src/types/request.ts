@@ -16,3 +16,13 @@ export type QueryType = {
   maxUser?: number;
   keyword?: string;
 };
+
+// Định nghĩa Type cho Query Filter
+export type QueryProductType = {
+  keyword?: string;
+  categoryId?: string | number;
+  minPrice?: string | number;
+  maxPrice?: string | number;
+  page?: number;
+  limit?: number;
+};

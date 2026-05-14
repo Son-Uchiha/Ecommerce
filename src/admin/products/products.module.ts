@@ -9,4 +9,4 @@ import { PermissionsModule } from '../permissions/permissions.module';
   providers: [ProductsService],
   imports: [AuthModule, PermissionsModule],
 })
-export class ProductsModule {}
+export class AdminProductsModule {}

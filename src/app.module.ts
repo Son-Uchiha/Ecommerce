@@ -8,16 +8,17 @@ import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { AuthModule } from './auth/auth.module';
 import { BullModule } from '@nestjs/bullmq';
 import { WorkerModule } from './workers/worker.module';
-import { ProductsModule } from './admin/products/products.module';
+import { AdminProductsModule } from './admin/products/products.module';
 import { PermissionsModule } from './admin/permissions/permissions.module';
 import { AdminCategoriesModule } from './admin/categories/categories.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     PermissionsModule,
-    ProductsModule,
+    AdminProductsModule,
     UsersModule,
     AuthModule,
     BullModule.forRoot({
@@ -30,6 +31,7 @@ import { CategoriesModule } from './categories/categories.module';
     WorkerModule,
     AdminCategoriesModule,
     CategoriesModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [
