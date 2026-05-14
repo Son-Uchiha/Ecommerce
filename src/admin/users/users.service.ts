@@ -8,13 +8,44 @@ import { CreateUser } from './dto/create-user';
 import { UpdateUser } from './dto/update-user';
 import { Prisma } from 'generated/prisma/client';
 import { hashPassword } from 'src/ultil/hasing';
+import { QueryType } from 'src/types/request';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll() {
-    return this.prismaService.user.findMany();
+  findAll(query: QueryType) {
+    console.log(query);
+    const { limit = 5, page = 1, minUser, maxUser, keyword } = query;
+    const skip = (page - 1) * limit;
+    return this.prismaService.user.findMany({
+      skip: +skip,
+      take: +limit,
+      where: {
+        // filter id
+        id: {
+          ...(minUser && {
+            gte: +minUser, // greater than or equal
+          }),
+
+          ...(maxUser && {
+            lte: +maxUser, // less than or equal
+          }),
+        },
+
+        // search Keyword
+        name: {
+          contains: keyword,
+        },
+      },
+      include: {
+        userRoles: {
+          select: {
+            roleId: true,
+          },
+        },
+      },
+    });
   }
 
   findOne(id: number) {

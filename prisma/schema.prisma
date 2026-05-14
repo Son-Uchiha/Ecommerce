@@ -25,6 +25,7 @@ model User {
   userRoles       UserRole[]
   userPermissions UserPermission[]
   isSuperAdmin    Boolean          @default(false)
+  products        Product[]
 
   @@map("users")
 }
@@ -132,7 +133,7 @@ model Product {
   salePrice   Decimal?      @map("sale_price") @db.Decimal(12, 2)
   stock       Int           @default(0)
   status      ProductStatus @default(ACTIVE)
-  createdBy   BigInt?       @map("created_by")
+  createdBy   Int?          @map("created_by")
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @default(now()) @updatedAt @map("updated_at")
 
@@ -140,8 +141,7 @@ model Product {
   category Category?      @relation(fields: [categoryId], references: [id])
   images   ProductImage[]
 
-  // Giả định bạn có bảng User, nếu không có bạn có thể tạm xóa dòng này
-  // creator     User?          @relation(fields: [createdBy], references: [id])
+  creator User? @relation(fields: [createdBy], references: [id])
 
   @@map("products")
 }

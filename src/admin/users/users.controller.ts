@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -14,6 +15,7 @@ import { CreateUserDto } from './dto/create-user';
 import { UpdateUserDto } from './dto/update-user';
 import { PermissionsGuardMixin } from 'src/guards/permissions/permissions.guard';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
+import { type QueryType } from 'src/types/request';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -21,8 +23,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @UseGuards(PermissionsGuardMixin('user:read'))
   @Get('/')
-  findAll() {
-    return this.usersService.findAll();
+  findAll(@Query() query: QueryType) {
+    return this.usersService.findAll(query);
   }
   @UseGuards(PermissionsGuardMixin('user:read'))
   @Get('/:id')
