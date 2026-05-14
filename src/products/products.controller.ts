@@ -12,6 +12,6 @@ export class ProductsController {
   }
   @Get(':id') // GET /products/1
   findOne(@Param('id') id: number) {
-    return this.productsService.findOne(id);
+    return this.productsService.findOne(+id);
   }
 }

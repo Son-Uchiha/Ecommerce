@@ -156,5 +156,6 @@ model ProductImage {
   // Quan hệ: Xóa sản phẩm thì xóa luôn ảnh (ON DELETE CASCADE)
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@unique([productId, imageUrl])
   @@map("product_images")
 }
