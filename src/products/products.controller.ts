@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { type QueryProductType } from 'src/types/request';
 
@@ -9,5 +9,9 @@ export class ProductsController {
   @Get()
   findAll(@Query() query: QueryProductType) {
     return this.productsService.findAll(query);
+  }
+  @Get(':id') // GET /products/1
+  findOne(@Param('id') id: number) {
+    return this.productsService.findOne(id);
   }
 }
