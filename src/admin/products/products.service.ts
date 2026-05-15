@@ -194,4 +194,21 @@ export class ProductsService {
       throw error;
     }
   }
+
+  async deleteProduct(id: number) {
+    try {
+      return await this.prismaService.product.delete({
+        where: { id },
+        select: { id: true, name: true },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Product not found');
+      }
+      throw error;
+    }
+  }
 }
