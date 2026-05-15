@@ -122,5 +122,76 @@ export class ProductsService {
     }
   }
 
-  async updateProduct(id: number, data: UpdateProductType) {}
+  async updateProduct(id: number, data: UpdateProductType) {
+    const { images, ...productData } = data;
+    // loại bỏ ảnh trùng
+    // undefined: user không update images, [] : user muốn xoá hết images
+    const uniqueImages = images ? [...new Set(images)] : undefined;
+    try {
+      return await this.prismaService.$transaction(async (tx) => {
+        // Kiểm tra product tồn tại
+        const product = await tx.product.findUnique({
+          where: { id },
+        });
+
+        if (!product) {
+          throw new NotFoundException('Product not found');
+        }
+
+        // update thông tin product
+        await tx.product.update({
+          where: { id },
+          data: productData,
+        });
+
+        // if có gửi images thì update lại toàn bộ ảnh
+        if (uniqueImages !== undefined) {
+          // xóa ảnh cũ
+          await tx.productImage.deleteMany({
+            where: { productId: id },
+          });
+
+          // Tạo ảnh mới
+          if (uniqueImages.length > 0) {
+            await tx.productImage.createMany({
+              data: uniqueImages.map((url, index) => ({
+                imageUrl: url,
+                isMain: index === 0,
+                productId: id,
+              })),
+              skipDuplicates: true,
+            });
+          }
+        }
+
+        // Trả về product mới
+        return await tx.product.findUnique({
+          where: { id },
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            images: {
+              select: {
+                id: true,
+                imageUrl: true,
+                isMain: true,
+              },
+            },
+          },
+        });
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2002'
+      ) {
+        throw new BadRequestException('Slug already exists');
+      }
+      throw error;
+    }
+  }
 }
