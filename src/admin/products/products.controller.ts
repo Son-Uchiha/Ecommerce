@@ -13,7 +13,11 @@ import { ProductsService } from './products.service';
 import { AuthGuard } from 'src/guards/auth/auth.guard';
 import { PermissionsGuardMixin } from 'src/guards/permissions/permissions.guard';
 import { type QueryProductType } from 'src/types/request';
-import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  UpdateStatusDto,
+} from './dto/product.dto';
 
 @Controller('admin/products')
 // @UseGuards(AuthGuard)
@@ -25,12 +29,12 @@ export class ProductsController {
   findAll(@Query() query: QueryProductType) {
     return this.productsService.findAll(query);
   }
-  @Get(':id') // GET /products/1
+  @Get(':id')
   findOne(@Param('id') id: number) {
     return this.productsService.findOne(+id);
   }
 
-  @Post() // POST /products
+  @Post()
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.createProduct(createProductDto);
   }
@@ -43,5 +47,10 @@ export class ProductsController {
   @Delete('/:id')
   delete(@Param('id') id: number) {
     return this.productsService.deleteProduct(+id);
+  }
+
+  @Put('/:id/status')
+  updateStatus(@Param('id') id: number, @Body() updateStatus: UpdateStatusDto) {
+    return this.productsService.updateStatus(+id, updateStatus);
   }
 }

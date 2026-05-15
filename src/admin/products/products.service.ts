@@ -9,6 +9,7 @@ import {
   CreateProductDto,
   CreateProductType,
   UpdateProductType,
+  UpdateStatusType,
 } from './dto/product.dto';
 import { Prisma } from 'generated/prisma/client';
 
@@ -200,6 +201,24 @@ export class ProductsService {
       return await this.prismaService.product.delete({
         where: { id },
         select: { id: true, name: true },
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('Product not found');
+      }
+      throw error;
+    }
+  }
+
+  async updateStatus(id: number, data: UpdateStatusType) {
+    try {
+      return await this.prismaService.product.update({
+        where: { id },
+        data,
+        select: { id: true, status: true },
       });
     } catch (error) {
       if (
