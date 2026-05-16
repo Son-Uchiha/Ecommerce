@@ -13,6 +13,7 @@ import { PermissionsModule } from './admin/permissions/permissions.module';
 import { AdminCategoriesModule } from './admin/categories/categories.module';
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ProductsModule } from './products/products.module';
     AdminCategoriesModule,
     CategoriesModule,
     ProductsModule,
+    CartModule,
   ],
   controllers: [AppController],
   providers: [

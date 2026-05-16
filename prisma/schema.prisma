@@ -26,6 +26,7 @@ model User {
   userPermissions UserPermission[]
   isSuperAdmin    Boolean          @default(false)
   products        Product[]
+  cart            Cart?
 
   @@map("users")
 }
@@ -141,7 +142,8 @@ model Product {
   category Category?      @relation(fields: [categoryId], references: [id])
   images   ProductImage[]
 
-  creator User? @relation(fields: [createdBy], references: [id])
+  creator   User?      @relation(fields: [createdBy], references: [id])
+  cartItems CartItem[]
 
   @@map("products")
 }
@@ -158,4 +160,34 @@ model ProductImage {
 
   @@unique([productId, imageUrl])
   @@map("product_images")
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Quan hệ
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cartItems CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int      @map("cart_id")
+  productId Int      @map("product_id")
+  quantity  Int
+  price     Decimal  @db.Decimal(12, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Quan hệ
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
 }
