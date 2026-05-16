@@ -25,7 +25,7 @@ export class CartController {
   }
   @Post('items')
   addToCard(@Req() req: AuthRequest, @Body() body: AddToCartDto) {
-    return this.cartService.addToCard(req.user.id, body);
+    return this.cartService.addToCart(req.user.id, body);
   }
   @Put('items/:productId')
   updateItemQuantity(

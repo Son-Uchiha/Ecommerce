@@ -5,62 +5,93 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AddToCartType, UpdateCartItemType } from './dto/cart.dto';
+import { Prisma } from 'generated/prisma/client';
 
 @Injectable()
 export class CartService {
   constructor(private readonly prismaService: PrismaService) {}
   async getCart(userId: number) {
-    // Tìm cart của user, include luôn các items bên trong bảng cartItem
     const cart = await this.prismaService.cart.findUnique({
       where: { userId },
-      include: { cartItems: true },
+      include: {
+        cartItems: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+                salePrice: true,
+                images: {
+                  where: { isMain: true },
+                  select: { imageUrl: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
-    return cart || { cartItems: [] }; // Nếu chưa có cart trả về mảng rỗng
+    return cart || { cartItems: [] };
   }
 
   async addToCart(userId: number, data: AddToCartType) {
     const { productId, quantity } = data;
-    // 1. Kiểm tra product có tồn tại và đủ stock
-    const product = await this.prismaService.product.findUnique({
-      where: { id: productId },
-    });
-    if (!product) throw new NotFoundException('Sản phẩm không tồn tại');
-    if (quantity > product.stock)
-      throw new BadRequestException('Sản phẩm vượt quá số lượng tồn kho');
-    // 2. Tạo cart nếu user chưa có
-    let cart = await this.prismaService.cart.findUnique({ where: { userId } });
-    if (!cart) {
-      cart = await this.prismaService.cart.create({ data: { userId } });
-    }
-    // 3. Kiểm tra xem sản phẩm đã có trong giỏ chưa
-    const existingItem = await this.prismaService.cartItem.findUnique({
-      where: {
-        cartId_productId: { cartId: cart.id, productId },
-      },
-    });
+    // Sử dụng Interactive Transaction
+    return await this.prismaService.$transaction(
+      async (tx) => {
+        // 1. Kiểm tra product có tồn tại không
+        const product = await tx.product.findUnique({
+          where: { id: productId },
+        });
+        if (!product) throw new NotFoundException('Sản phẩm không tồn tại');
 
-    if (existingItem) {
-      // Nếu đã có -> Tăng quantity
-      const newQuantity = existingItem.quantity + quantity;
-      if (newQuantity > product.stock)
-        throw new BadRequestException('Vượt quá số lượng tồn kho');
-      return this.prismaService.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: newQuantity },
-      });
-    } else {
-      // Nếu chưa có -> Thêm mới vào cart_items
-      // Lấy theo giá hiện tại của product
-      const priceToSave = product.salePrice ? product.salePrice : product.price;
-      return this.prismaService.cartItem.create({
-        data: {
-          cartId: cart.id,
-          productId,
-          quantity,
-          price: priceToSave,
-        },
-      });
-    }
+        // 2. Lấy hoặc tạo cart một cách an toàn (Sử dụng UPSERT)
+        // Upsert sẽ khóa row hoặc xử lý conflict ở cấp database, chống lỗi Duplicate Creation
+        const cart = await tx.cart.upsert({
+          where: { userId },
+          update: {}, // Đã có thì không làm gì
+          create: { userId }, // Chưa có thì tạo
+        });
+
+        // 3. Lấy item hiện tại để check số lượng trước khi thêm
+        const existingItem = await tx.cartItem.findUnique({
+          where: { cartId_productId: { cartId: cart.id, productId } },
+        });
+
+        const currentQuantity = existingItem?.quantity || 0;
+        if (currentQuantity + quantity > product.stock) {
+          throw new BadRequestException('Vượt quá số lượng tồn kho');
+        }
+
+        const priceToSave = product.salePrice ?? product.price;
+
+        // 4. Cập nhật hoặc tạo mới CartItem (Sử dụng UPSERT + INCREMENT)
+        return await tx.cartItem.upsert({
+          where: {
+            cartId_productId: { cartId: cart.id, productId },
+          },
+          update: {
+            // SỬ DỤNG ATOMIC OPERATION: Database tự đảm nhận việc cộng dồn
+            // Chống hoàn toàn lỗi Lost Update
+            quantity: { increment: quantity },
+            price: priceToSave,
+          },
+          create: {
+            cartId: cart.id,
+            productId,
+            quantity,
+            price: priceToSave,
+          },
+        });
+      },
+      {
+        // TÙY CHỌN NÂNG CAO: Chống hoàn toàn việc Bypass Stock
+        // Dùng Isolation Level là Serializable sẽ ép các transaction chạy tuần tự (hoặc rollback nếu đụng độ).
+        // Phù hợp nếu logic tồn kho của bạn cực kỳ nghiêm ngặt.
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      },
+    );
   }
 
   async updateItemQuantity(
@@ -85,12 +116,24 @@ export class CartService {
         where: { cartId_productId: { cartId: cart.id, productId } },
       });
     }
+    // KIỂM TRA TỒN KHO
+    const product = await this.prismaService.product.findUnique({
+      where: { id: productId },
+      select: { stock: true }, // Chỉ lấy cột stock để tối ưu hiệu suất
+    });
+    if (!product) throw new NotFoundException('Sản phẩm không tồn tại');
+    if (quantity > product.stock) {
+      throw new BadRequestException(
+        `Sản phẩm chỉ còn ${product.stock} chiếc trong kho`,
+      );
+    }
     // Cập nhật số lượng
     return this.prismaService.cartItem.update({
       where: { cartId_productId: { cartId: cart.id, productId } },
       data: { quantity },
     });
   }
+
   async removeCartItem(userId: number, productId: number) {
     const cart = await this.prismaService.cart.findUnique({
       where: { userId },

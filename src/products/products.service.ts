@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { QueryProductType } from 'src/types/request';
 
@@ -7,14 +11,13 @@ export class ProductsService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findAll(query: QueryProductType) {
-    const {
-      limit = 10,
-      page = 1,
-      minPrice,
-      maxPrice,
-      keyword,
-      categoryId,
-    } = query;
+    const minPrice = query.minPrice ? Math.max(0, +query.minPrice) : undefined;
+    const maxPrice = query.maxPrice ? Math.max(0, +query.maxPrice) : undefined;
+    // Validate minPrice <= maxPrice
+    if (minPrice && maxPrice && minPrice > maxPrice) {
+      throw new BadRequestException('minPrice không thể lớn hơn maxPrice');
+    }
+    const { limit = 10, page = 1, keyword, categoryId } = query;
     const skip = (+page - 1) * +limit;
     return this.prismaService.product.findMany({
       skip: skip,
