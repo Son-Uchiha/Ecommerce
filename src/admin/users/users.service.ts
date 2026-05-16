@@ -7,7 +7,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateUser } from './dto/create-user';
 import { UpdateUser } from './dto/update-user';
 import { Prisma } from 'generated/prisma/client';
-import { hashPassword } from 'src/ultil/hasing';
+import { hashPassword } from 'src/ultil/hashing';
 import { QueryType } from 'src/types/request';
 
 @Injectable()

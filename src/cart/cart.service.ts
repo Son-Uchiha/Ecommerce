@@ -88,7 +88,6 @@ export class CartService {
       {
         // TÙY CHỌN NÂNG CAO: Chống hoàn toàn việc Bypass Stock
         // Dùng Isolation Level là Serializable sẽ ép các transaction chạy tuần tự (hoặc rollback nếu đụng độ).
-        // Phù hợp nếu logic tồn kho của bạn cực kỳ nghiêm ngặt.
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
       },
     );

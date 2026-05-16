@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Register } from './dto/register.dto';
-import { hashPassword, verifyPassword } from 'src/ultil/hasing';
+import { hashPassword, verifyPassword } from 'src/ultil/hashing';
 import { Prisma } from 'generated/prisma/client';
 import { LoginType } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
