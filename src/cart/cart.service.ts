@@ -18,7 +18,7 @@ export class CartService {
     return cart || { cartItems: [] }; // Nếu chưa có cart trả về mảng rỗng
   }
 
-  async addToCard(userId: number, data: AddToCartType) {
+  async addToCart(userId: number, data: AddToCartType) {
     const { productId, quantity } = data;
     // 1. Kiểm tra product có tồn tại và đủ stock
     const product = await this.prismaService.product.findUnique({
