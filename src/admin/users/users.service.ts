@@ -97,13 +97,16 @@ export class UsersService {
     }
   }
   async updateUser(id: number, data: UpdateUser) {
-    const { password } = data;
+    const { password, ...otherData } = data;
     try {
       return await this.prismaService.user.update({
         where: { id },
         data: {
-          ...data,
-          password: await hashPassword(password as string),
+          ...otherData, // Truyền các data khác (như name, role...)
+          ...(password && {
+            // Chỉ đính kèm cập nhật password nếu có gửi
+            password: await hashPassword(password as string),
+          }),
         },
       });
     } catch (error) {

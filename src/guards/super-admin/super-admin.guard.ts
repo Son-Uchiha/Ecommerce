@@ -3,7 +3,7 @@ import { AuthRequest } from 'src/types/request';
 
 @Injectable()
 export class SuperAdminGuard implements CanActivate {
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();
     const user = request.user;
     if (user.isSuperAdmin) {

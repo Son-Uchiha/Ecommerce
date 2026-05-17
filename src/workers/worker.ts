@@ -1,7 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { WorkerModule } from './worker.module';
+import { connectRedis } from 'src/ultil/redis';
 
 async function bootstrap() {
+  await connectRedis();
   await NestFactory.createApplicationContext(WorkerModule);
 }
 

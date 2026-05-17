@@ -38,3 +38,10 @@ export type EmailJobData = {
   name?: string;
   otp?: string | number;
 };
+
+export type JwtTokenPayload = {
+  id: number;
+  jti: string;
+  exp: number;
+  iat?: number;
+};
