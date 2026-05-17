@@ -19,7 +19,7 @@ export class ProductsService {
     }
     const { limit = 10, page = 1, keyword, categoryId } = query;
     const skip = (+page - 1) * +limit;
-    return this.prismaService.product.findMany({
+    const product = this.prismaService.product.findMany({
       skip: skip,
       take: +limit,
       where: {

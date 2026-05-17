@@ -27,7 +27,7 @@ export class ProductsService {
     const { limit = 10, page = 1, keyword, categoryId } = query;
     const skip = (+page - 1) * +limit;
 
-    return this.prismaService.product.findMany({
+    const product = await this.prismaService.product.findMany({
       skip: skip,
       take: +limit,
       where: {
@@ -71,6 +71,35 @@ export class ProductsService {
         },
       },
     });
+    // THÊM totalCount (copy y hệt where bên trên)
+    const total = this.prismaService.product.count({
+      where: {
+        status: 'ACTIVE',
+        ...(categoryId && { categoryId: +categoryId }),
+        price: {
+          ...(minPrice && { gte: +minPrice }),
+          ...(maxPrice && { lte: +maxPrice }),
+        },
+        ...(keyword && {
+          OR: [
+            { name: { contains: keyword } },
+            { description: { contains: keyword } },
+          ],
+        }),
+      },
+    });
+
+    const [data, totalCount] = await Promise.all([product, total]);
+
+    return {
+      data,
+      meta: {
+        page: +page,
+        limit: +limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / +limit),
+      },
+    };
   }
 
   async findOne(id: number) {
