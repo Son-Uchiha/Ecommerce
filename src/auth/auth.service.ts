@@ -216,6 +216,9 @@ export class AuthService {
     await this.emailQueue.add('reset-password', {
       email: user.email,
     });
+
+    //Xóa otp khỏi redis
+    await redisClient.del(`forgotPassword:${otp}`);
   }
   async changePassword(userId: number, data: ChangePassword) {
     const { oldPassword, newPassword, confirmPassword } = data;
