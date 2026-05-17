@@ -48,7 +48,7 @@ export class UsersService {
       },
     });
 
-    const total = this.prismaService.user.count({
+    const total = await this.prismaService.user.count({
       where: {
         id: {
           ...(minUser && { gte: +minUser }),
@@ -60,15 +60,13 @@ export class UsersService {
       },
     });
 
-    const [data, totalCount] = await Promise.all([users, total]);
-
     return {
-      data,
+      users,
       meta: {
         page: +page,
         limit: +limit,
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / +limit),
+        total: total,
+        totalPages: Math.ceil(total / +limit),
       },
     };
   }

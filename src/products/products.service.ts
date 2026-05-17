@@ -68,7 +68,7 @@ export class ProductsService {
     });
 
     // THÊM totalCount (copy y hệt where bên trên)
-    const total = this.prismaService.product.count({
+    const total = await this.prismaService.product.count({
       where: {
         status: 'ACTIVE',
         ...(categoryId && { categoryId: +categoryId }),
@@ -85,15 +85,13 @@ export class ProductsService {
       },
     });
 
-    const [data, totalCount] = await Promise.all([product, total]);
-
     return {
-      data,
+      product,
       meta: {
         page: +page,
         limit: +limit,
-        total: totalCount,
-        totalPages: Math.ceil(totalCount / +limit),
+        total: total,
+        totalPages: Math.ceil(total / +limit),
       },
     };
   }
