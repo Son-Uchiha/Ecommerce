@@ -7,5 +7,8 @@ export const redisClient = createClient({
     port: 6379,
   },
   password: process.env.REDIS_PASSWORD,
-}).on('error', () => console.log('Redis Client Error'));
-redisClient.connect();
+}).on('error', (err) => console.log('Redis Client Error', err));
+
+redisClient.connect().catch((err) => {
+  console.error('Không thể kết nối tới Redis:', err);
+});

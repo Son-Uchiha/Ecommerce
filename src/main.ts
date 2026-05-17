@@ -5,4 +5,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(process.env.PORT ?? 3000);
 }
-bootstrap();
+// Bổ sung .catch() ở đây
+bootstrap().catch((err) => {
+  console.error('Lỗi khi khởi động ứng dụng NestJS:', err);
+  process.exit(1);
+});

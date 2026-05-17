@@ -2,8 +2,14 @@ import { Request } from 'express';
 
 export interface AuthRequest extends Request {
   user: {
-    id: number;
     email: string;
+    password: string;
+    id: number;
+    name: string;
+    phone: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    isSuperAdmin: boolean;
   };
   jti: string;
   exp: number;
@@ -25,4 +31,10 @@ export type QueryProductType = {
   maxPrice?: string | number;
   page?: number;
   limit?: number;
+};
+
+export type EmailJobData = {
+  email: string;
+  name?: string;
+  otp?: string | number;
 };

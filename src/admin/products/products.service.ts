@@ -6,7 +6,6 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { QueryProductType } from 'src/types/request';
 import {
-  CreateProductDto,
   CreateProductType,
   UpdateProductType,
   UpdateStatusType,

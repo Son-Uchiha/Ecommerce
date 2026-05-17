@@ -5,4 +5,8 @@ async function bootstrap() {
   await NestFactory.createApplicationContext(WorkerModule);
 }
 
-bootstrap();
+// Bổ sung .catch() ở đây để xử lý lỗi
+bootstrap().catch((err) => {
+  console.error('Lỗi khi khởi động Worker:', err);
+  process.exit(1); // Dừng process nếu worker không thể khởi động
+});

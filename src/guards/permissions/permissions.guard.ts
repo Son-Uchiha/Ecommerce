@@ -6,8 +6,8 @@ import {
   mixin,
   Type,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
 import { PermissionsService } from 'src/admin/permissions/permissions.service';
+import { AuthRequest } from 'src/types/request';
 
 export const PermissionsGuardMixin = (
   permissionName: string,
@@ -16,7 +16,7 @@ export const PermissionsGuardMixin = (
   class PermissionsGuard implements CanActivate {
     constructor(private readonly permissionService: PermissionsService) {}
     async canActivate(context: ExecutionContext): Promise<boolean> {
-      const request = context.switchToHttp().getRequest();
+      const request = context.switchToHttp().getRequest<AuthRequest>();
       const user = request.user;
       // 1. Kiểm tra nếu user chưa đăng nhập (AuthGuard chưa chạy hoặc lỗi)
       if (!user || !user.id) {
