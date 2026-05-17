@@ -74,7 +74,6 @@ export class ProductsService {
     // THÊM totalCount (copy y hệt where bên trên)
     const total = this.prismaService.product.count({
       where: {
-        status: 'ACTIVE',
         ...(categoryId && { categoryId: +categoryId }),
         price: {
           ...(minPrice && { gte: +minPrice }),
