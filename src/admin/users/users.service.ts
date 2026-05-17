@@ -14,11 +14,10 @@ import { QueryType } from 'src/types/request';
 export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  findAll(query: QueryType) {
-    console.log(query);
+  async findAll(query: QueryType) {
     const { limit = 5, page = 1, minUser, maxUser, keyword } = query;
     const skip = (page - 1) * limit;
-    return this.prismaService.user.findMany({
+    const users = await this.prismaService.user.findMany({
       skip: +skip,
       take: +limit,
       where: {
@@ -48,6 +47,30 @@ export class UsersService {
         },
       },
     });
+
+    const total = this.prismaService.user.count({
+      where: {
+        id: {
+          ...(minUser && { gte: +minUser }),
+          ...(maxUser && { lte: +maxUser }),
+        },
+        ...(keyword && {
+          name: { contains: keyword },
+        }),
+      },
+    });
+
+    const [data, totalCount] = await Promise.all([users, total]);
+
+    return {
+      data,
+      meta: {
+        page: +page,
+        limit: +limit,
+        total: totalCount,
+        totalPages: Math.ceil(totalCount / +limit),
+      },
+    };
   }
 
   findOne(id: number) {
