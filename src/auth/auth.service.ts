@@ -30,8 +30,7 @@ export class AuthService {
 
   async login(dataLogin: LoginType) {
     // Kiểm tra email có tồn tại hay ko
-    const { email, password }: { email: string; password: string } =
-      dataLogin;
+    const { email, password } = dataLogin;
     const user = await this.prismaService.user.findUnique({
       where: { email },
     });
@@ -60,9 +59,8 @@ export class AuthService {
       removeOnComplete: true, // Xóa job khỏi Redis khi xong để nhẹ RAM
     });
     // Cắm jti của refresh token
-    const refreshTokenPayload = (await this.jwtService.decode(
-      refreshToken,
-    )) as JwtTokenPayload;
+    const refreshTokenPayload =
+      this.jwtService.decode<JwtTokenPayload>(refreshToken);
     const ttl = Math.ceil(refreshTokenPayload.exp - Date.now() / 1000);
     // key redis: refreshToken:{userId}:{jti}
     await redisClient.setEx(
@@ -78,8 +76,7 @@ export class AuthService {
   }
 
   async register(dataRegister: Register) {
-    const { email, password }: { email: string; password: string } =
-      dataRegister;
+    const { email, password } = dataRegister;
     // check email trùng sớm
     const emailCheck = await this.prismaService.user.findUnique({
       where: { email },
@@ -110,12 +107,8 @@ export class AuthService {
 
   async profile(token: string) {
     try {
-      const {
-        id,
-        jti,
-        exp,
-      }: { id: number; jti: string; exp: number } =
-        await this.jwtService.verifyAsync(token);
+      const { id, jti, exp } =
+        await this.jwtService.verifyAsync<JwtTokenPayload>(token);
       const blacklist = await redisClient.get(`blacklist:${jti}`);
       if (blacklist) {
         return false;
@@ -131,10 +124,12 @@ export class AuthService {
 
   async refreshToken(refreshToken: string) {
     try {
-      const { id, jti }: { id: number; jti: string } =
-        await this.jwtService.verifyAsync(refreshToken, {
+      const { id, jti } = await this.jwtService.verifyAsync<JwtTokenPayload>(
+        refreshToken,
+        {
           secret: process.env.JWT_REFRESH_SECRET,
-        });
+        },
+      );
       // Kiểm tra refresh có tồn tại trên redis hay ko
       const tokenFromRedis = await redisClient.get(`refreshToken:${id}:${jti}`);
       if (!tokenFromRedis) {
@@ -154,9 +149,8 @@ export class AuthService {
       //Thu hồi refresh token cũ
       await redisClient.del(`refreshToken:${id}:${jti}`);
       // Cắm jti của refresh token mới
-      const refreshTokenPayload = (await this.jwtService.decode(
-        refreshTokenNew,
-      )) as JwtTokenPayload;
+      const refreshTokenPayload =
+        this.jwtService.decode<JwtTokenPayload>(refreshTokenNew);
       const ttl = Math.ceil(refreshTokenPayload.exp - Date.now() / 1000);
       // key redis: refreshToken:{userId}:{jti}
       await redisClient.setEx(
@@ -183,7 +177,7 @@ export class AuthService {
     return { message: 'logout thành công' };
   }
 
-  async forgotPassword({ email }: { email: string }) {
+  async forgotPassword({ email }: forgotPassword) {
     // Kiểm tra email có tồn tại không ?
     const user = await this.prismaService.user.findUnique({
       where: { email },
@@ -194,7 +188,7 @@ export class AuthService {
     // Tạo mã otp 6 số
     const otp = crypto.randomInt(100000, 999999).toString();
     //Lưu vào redis kèm userId
-    const ttl = 60;
+    const ttl = 1000;
     await redisClient.setEx(`forgotPassword:${otp}`, ttl, user.id.toString());
     // addJob để gửi mail otp
     await this.emailQueue.add('forgotPassword-otp', {
@@ -212,11 +206,7 @@ export class AuthService {
   }
 
   async resetPassword(data: ResetPassword) {
-    const {
-      password,
-      confirmPassword,
-      otp,
-    }: { password: string; confirmPassword: string; otp: string } = data;
+    const { password, confirmPassword, otp } = data;
     if (password !== confirmPassword) {
       throw new BadRequestException('2 mật khẩu không khớp nhau');
     }
@@ -238,12 +228,7 @@ export class AuthService {
     await redisClient.del(`forgotPassword:${otp}`);
   }
   async changePassword(userId: number, data: ChangePassword) {
-    const {
-      oldPassword,
-      newPassword,
-      confirmPassword,
-    }: { oldPassword: string; newPassword: string; confirmPassword: string } =
-      data;
+    const { oldPassword, newPassword, confirmPassword } = data;
     // 1. Kiểm tra mật khẩu mới và xác nhận mật khẩu có khớp không
     if (newPassword !== confirmPassword) {
       throw new BadRequestException('Mật khẩu mới không khớp');
